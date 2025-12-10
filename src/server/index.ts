@@ -2,26 +2,14 @@ import express from 'express';
 
 import { makeSignUpController } from '../factories/makeSignUpController';
 import { makeSignInController } from '../factories/makeSignInController';
+import { routeAdapter } from './adapters/routeAdapter';
 
 const app = express();
 
 app.use(express.json());
 
-app.post('/sign-up', async (request, response) => {
-  const signUpController = makeSignUpController();
-
-  const { statusCode, body } = await signUpController.handle({ body: request.body });
-
-  response.status(statusCode).json(body);
-});
-
-app.route('/sign-in').post(async (request, response) => {
-  const signInController = makeSignInController();
-
-  const { statusCode, body } = await signInController.handle({ body: request.body });
-
-  response.status(statusCode).json(body);
-});
+app.post('/sign-up', routeAdapter(makeSignUpController()));
+app.route('/sign-in').post(routeAdapter(makeSignInController()));
 
 app.listen(3001, () => {
   console.log('Server is running at http://localhost:3001');
