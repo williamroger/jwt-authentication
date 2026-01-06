@@ -5,6 +5,8 @@ import { makeSignInController } from '../factories/makeSignInController';
 import { makeListLeadsController } from '../factories/makeListLeadsController';
 
 import { routeAdapter } from './adapters/routeAdapter';
+import { middlewareAdapter } from './adapters/middlewareAdapter';
+import { makeAuthenticationMiddleware } from '../factories/makeAuthenticationMiddleware';
 
 const app = express();
 
@@ -15,14 +17,7 @@ app.post('/sign-in', routeAdapter(makeSignInController()));
 
 app.get(
   '/leads',
-  (request, response, next) => {
-    const authorization = request.headers.authorization;
-    if (!authorization) {
-      response.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-    next();
-  },
+  middlewareAdapter(makeAuthenticationMiddleware()),
   routeAdapter(makeListLeadsController())
 );
 
